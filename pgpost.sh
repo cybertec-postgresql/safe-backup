@@ -2,10 +2,8 @@
 
 # post-backup script for online backup
 
-export PGHOST=/tmp
-export PGPORT=5432
-export PGDATABASE=postgres
-export PGUSER=postgres
+# load configuration
+. ./setup.sh
 
 # start a psql coprocess
 coproc PSQL { psql -Atq; }
