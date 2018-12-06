@@ -29,9 +29,11 @@ coproc BACKUP {
 	if [ $? -ne 0 ]; then exit 1; fi
 
 	echo 'CREATE TABLE IF NOT EXISTS backup (
+			id integer CONSTRAINT backup_pkey PRIMARY KEY DEFAULT 1,
 			state backup_state NOT NULL,
 			pid integer,
-			backup_label text
+			backup_label text,
+			tablespace_map text
 		);' >&${PSQL[1]}
 	if [ $? -ne 0 ]; then exit 1; fi
 
@@ -57,10 +59,11 @@ coproc BACKUP {
 	echo "$line"
 
 	# insert the information to the "backup" table
-	echo "INSERT INTO backup (state, pid, backup_label)
-		VALUES ('running'::backup_state, pg_backend_pid(), NULL)
+	echo "INSERT INTO backup (state, pid, backup_label, tablespace_map)
+		VALUES ('running'::backup_state, pg_backend_pid(), NULL, NULL)
 		ON CONFLICT ON CONSTRAINT backup_pkey DO UPDATE
-		SET state = 'running'::backup_state, pid = pg_backend_pid(), backup_label = NULL;" >&${PSQL[1]}
+		SET state = 'running'::backup_state, pid = pg_backend_pid(),
+			backup_label = NULL, tablespace_map = NULL;" >&${PSQL[1]}
 	if [ $? -ne 0 ]; then exit 1; fi
 
 	# wait for the backup to finish
@@ -93,8 +96,9 @@ coproc BACKUP {
 
 	# complete backup and store "backup_label"
 	echo "UPDATE backup SET
-		state = 'complete'::backup_state,
-		backup_label = (SELECT labelfile FROM pg_stop_backup(FALSE));" >&${PSQL[1]}
+		(state, backup_label, tablespace_map) =
+		(SELECT 'complete'::backup_state, labelfile, spcmapfile
+			FROM pg_stop_backup(FALSE));" >&${PSQL[1]}
 	if [ $? -ne 0 ]; then exit 1; fi
 
 	# quit the psql coprocess

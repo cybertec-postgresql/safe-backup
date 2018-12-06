@@ -22,6 +22,10 @@ file into the backup to complete the online backup.
 Alternatively, you can get the file contents by connecting to the database
 and running `SELECT backup_label FROM backup`.
 
+If you are using tablespaces, you'll have to collect the contents of the
+`tablespace_map` file from the column of that name in the `backup` table
+and also store it with the backup.
+
 ## Configuration ##
 
 The scripts are configured by editing `config.sh`.
@@ -39,6 +43,8 @@ the backup to complete before marking the backup as failed.
 If it does not already exist, the pre-backup script creates a table
 `backup` with the following columns:
 
+- `id`: a primary key that is always 1 (the table has only a single row)
+
 - `state`: a column with an enum type that can take the values `running`,
   `done`, `complete` and `failed`, indicating the state of the bachup
 
@@ -46,6 +52,9 @@ If it does not already exist, the pre-backup script creates a table
   the backup to complete
 
 - `backup_label`: the contents of the `backup_label` file for the backup
+
+- `tablespace_map`: the contents of the `tablespace_map` file for the
+  backup or NULL if there is only the default tablespace
 
 Then it enters the database into backup mode and returns the WAL position
 of the checkpoint starting the backup.
