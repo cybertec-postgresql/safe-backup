@@ -29,7 +29,6 @@ coproc BACKUP {
 	if [ $? -ne 0 ]; then exit 1; fi
 
 	echo 'CREATE TABLE IF NOT EXISTS backup (
-			id integer CONSTRAINT backup_pkey PRIMARY KEY DEFAULT 1,
 			state backup_state NOT NULL,
 			pid integer,
 			backup_label text
