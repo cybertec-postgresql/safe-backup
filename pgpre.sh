@@ -3,7 +3,7 @@
 # pre-backup script for online backup
 
 # load configuration
-. ./setup.sh
+. ./config.sh
 
 # start a coprocess that will perform the backup
 coproc BACKUP {

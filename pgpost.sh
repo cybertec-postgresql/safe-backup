@@ -3,7 +3,7 @@
 # post-backup script for online backup
 
 # load configuration
-. ./setup.sh
+. ./config.sh
 
 # start a psql coprocess
 coproc PSQL { psql -Atq; }
