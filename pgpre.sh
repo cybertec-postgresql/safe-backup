@@ -65,13 +65,25 @@ coproc BACKUP {
 	if [ $? -ne 0 ]; then exit 1; fi
 
 	# wait for the backup to finish
+	declare -i secs_waited=0
 	while
 		echo 'SELECT state FROM backup;' >&${PSQL[1]}
 		if [ $? -ne 0 ]; then exit 1; fi
 		read -u ${PSQL[0]} line
 		[ "$line" = 'running' ]
 	do
+		# exit with error if the timeout has expired
+		if [ "$backup_timeout" -gt 0 -a "$secs_waited" -gt "$backup_timeout" ]; then
+			echo "UPDATE backup SET
+				state = 'failed'::backup_state;" >&${PSQL[1]}
+			echo '\q' >&${PSQL[1]}
+			echo "Backup timed out" 1>&2
+			exit 1
+		fi
+
 		sleep 5
+
+		secs_waited=secs_waited+5
 	done
 
 	if [ "$line" != 'done' ]; then
