@@ -32,11 +32,15 @@ The scripts are configured by editing `config.sh`.
 
 The environment variables `PGHOST`, `PGPORT`, `PGDATABASE` and `PGUSER`
 determine which database cluster is backed up.  The table `backup`
-containint the backup information will be created in `PGDATABASE`.
+containing the backup information will be created in `PGDATABASE`.
 
 The parameter `backup_timeout` can be set to 0 to disable a timeout
 or to the number of seconds the pre-backup script should wait for
 the backup to complete before marking the backup as failed.
+
+If you don't set a timeout and don't call `pgpost.sh` to end the backup,
+the session waiting for the backup to end will continue until you next
+call `pgpre.sh`.
 
 ## Implementation ##
 
@@ -58,17 +62,16 @@ If it does not already exist, the pre-backup script creates a table
 
 Then it enters the database into backup mode and returns the WAL position
 of the checkpoint starting the backup.
-
 After that, it exits sucessfully, indicating that the actual backup can
-begin, but the co-process controlling the PostgreSQL session keeps
-running in the background and waits for the `state` column in the `backup`
-table to signal that the backup is done.
+begin
 
-If that does not happen before `backup_timeout` expires, the backup is
-marked as failed.
+A co-process controlling the PostgreSQL session keeps running in the
+background and waits for the `state` column in the `backup` table to signal
+that the backup is done.  If that does not happen before `backup_timeout`
+expires, the backup is marked as failed.
 
-Once the backup is done, the co-process ends backup mode and stored the
-resulting `backup_label` contents in the `backup` table.
+Once the backup is done, the co-process ends backup mode and stores the
+resulting `backup_label` and `tablespace_map` in the `backup` table.
 
 The post-backup script sets the `state` column in the `backup` table to
 `done` and waits until the pre-backup co-process has set the `state`

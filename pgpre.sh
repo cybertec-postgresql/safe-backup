@@ -46,7 +46,7 @@ coproc BACKUP {
 	WHERE state = 'running'::backup_state;" >&${PSQL[1]}
 	if [ $? -ne 0 ]; then exit 1; fi
 
-	# read the query result
+	# read and ignore the query result
 	read -u ${PSQL[0]} line
 	if [ $? -ne 0 ]; then exit 1; fi
 
@@ -58,7 +58,7 @@ coproc BACKUP {
 	read -u ${PSQL[0]} line
 	echo "$line"
 
-	# insert the information to the "backup" table
+	# insert the information about the running backup into the "backup" table
 	echo "INSERT INTO backup (state, pid, backup_label, tablespace_map)
 		VALUES ('running'::backup_state, pg_backend_pid(), NULL, NULL)
 		ON CONFLICT ON CONSTRAINT backup_pkey DO UPDATE
@@ -69,7 +69,7 @@ coproc BACKUP {
 	# wait for the backup to finish
 	declare -i secs_waited=0
 	while
-		echo 'SELECT state FROM backup;' >&${PSQL[1]}
+		echo 'SELECT state FROM backup WHERE pid = pg_backend_pid();' >&${PSQL[1]}
 		if [ $? -ne 0 ]; then exit 1; fi
 		read -u ${PSQL[0]} line
 		[ "$line" = 'running' ]
