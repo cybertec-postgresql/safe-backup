@@ -62,7 +62,7 @@ If it does not already exist, the pre-backup script creates a table
 
 Then it enters the database into backup mode and returns the WAL position
 of the checkpoint starting the backup.
-After that, it exits sucessfully, indicating that the actual backup can
+After that, it exits successfully, indicating that the actual backup can
 begin
 
 A co-process controlling the PostgreSQL session keeps running in the
