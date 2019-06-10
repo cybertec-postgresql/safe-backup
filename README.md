@@ -50,7 +50,7 @@ If it does not already exist, the pre-backup script creates a table
 - `id`: a primary key that is always 1 (the table has only a single row)
 
 - `state`: a column with an enum type that can take the values `running`,
-  `done`, `complete` and `failed`, indicating the state of the bachup
+  `done`, `complete` and `failed`, indicating the state of the backup
 
 - `pid`: the backend process ID if the pre-backup process that waits for
   the backup to complete
