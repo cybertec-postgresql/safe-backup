@@ -51,7 +51,7 @@ coproc BACKUP {
 	if [ $? -ne 0 ]; then exit 1; fi
 
 	# start the online backup
-	echo "SELECT pg_start_backup('$(date +%F\ %T)', FALSE, FALSE);" >&${PSQL[1]}
+	echo "SELECT pg_backup_start('$(date +%F\ %T)', FALSE);" >&${PSQL[1]}
 	if [ $? -ne 0 ]; then exit 1; fi
 
 	# report the backup starting location
@@ -98,7 +98,7 @@ coproc BACKUP {
 	echo "UPDATE backup SET
 		(state, backup_label, tablespace_map) =
 		(SELECT 'complete'::backup_state, labelfile, spcmapfile
-			FROM pg_stop_backup(FALSE));" >&${PSQL[1]}
+			FROM pg_backup_stop());" >&${PSQL[1]}
 	if [ $? -ne 0 ]; then exit 1; fi
 
 	# quit the psql coprocess

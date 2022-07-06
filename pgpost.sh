@@ -20,7 +20,7 @@ if [ $? -ne 0 ]; then exit 1; fi
 echo "UPDATE backup SET state = 'done'::backup_state;" >&${PSQL[1]}
 if [ $? -ne 0 ]; then exit 1; fi
 
-# wait a minute for pg_stop_backup() to finish
+# wait a minute for pg_backup_stop() to finish
 declare -i secs_waited=0
 while
 	echo 'SELECT state FROM backup;' >&${PSQL[1]}

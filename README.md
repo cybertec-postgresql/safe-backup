@@ -1,5 +1,5 @@
 Now that exclusive backup with `pg_start_backup()` and `pg_stop_backup()`
-has been deprecated, it is more difficult to perform a PostgreSQL online
+has been removed, it is more difficult to perform a PostgreSQL online
 file system backup using a pre-backup and a post-backup script.
 
 This project provides two `bash` scripts that can be used for that purpose.
