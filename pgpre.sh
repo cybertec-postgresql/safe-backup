@@ -56,6 +56,7 @@ coproc BACKUP {
 
 	# report the backup starting location
 	read -u ${PSQL[0]} line
+	if [ $? -ne 0 ]; then exit 1; fi
 	echo "$line"
 
 	# insert the information about the running backup into the "backup" table
