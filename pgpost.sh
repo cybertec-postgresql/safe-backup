@@ -6,7 +6,7 @@
 . ./config.sh
 
 # start a psql coprocess
-coproc PSQL { psql -Atq; }
+coproc PSQL { psql -XAtq; }
 
 # make sure we exit on error
 echo '\set ON_ERROR_STOP on' >&${PSQL[1]}
